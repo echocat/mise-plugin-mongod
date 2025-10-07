@@ -4,5 +4,5 @@ PLUGIN = { -- luacheck: ignore
     description = "A mise tool plugin for mongod",
     author = "echocat",
     updateUrl = "https://github.com/echocat/mise-plugin-mongod",
-    minRuntimeVersion = "2025.10.0",
+    minRuntimeVersion = "0.3.0",
 }
