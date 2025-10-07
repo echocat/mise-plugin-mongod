@@ -11,7 +11,33 @@ This provides a MISE plugin to use `mongod` and `mongos` in your project as tool
 
 ## Usage
 
-1. Install the plugin
+You have two options, either use it as a [vfox plugin / directly as a MISE tool](#vfox-plugin) or as an [MISE plugin](#mise-plugin).
+
+### vfox Plugin
+
+1. Add a handy alias
+   ```shell
+   mise alias set vfox:echocat/mise-plugin-mongod mongod
+   ```
+
+2. Install the tool into your project
+    * Always latest version:
+      ```shell
+      mise use mongod@latest
+      ```
+    * Specific version:
+      ```shell
+      mise use mongod@8.2.1
+      ```
+
+3. Check if it is working
+   ```shell
+   mise exec -- mongod --version
+   ```
+
+### MISE Plugin
+
+1. Install the plugin (ℹ️ this only needs to be done once per user - **not** per project - it will be installed inside your current user)
    ```shell
    mise plugin install mongod https://github.com/echocat/mise-plugin-mongod
    ```
@@ -19,11 +45,11 @@ This provides a MISE plugin to use `mongod` and `mongos` in your project as tool
 2. Install the tool into your project
     * Always latest version:
       ```shell
-      mise install mongod@latest
+      mise use mongod@latest
       ```
     * Specific version:
       ```shell
-      mise install mongod@8.2.1
+      mise use mongod@8.2.1
       ```
 
 3. Check if it is working
