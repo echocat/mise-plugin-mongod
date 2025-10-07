@@ -1,0 +1,107 @@
+name: Release
+
+on:
+  release:
+    types: [ created, edited, published ]
+
+permissions:
+  contents: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check context
+        run: |
+          echo "release.id:    ${{ github.event.release.id }}"
+          echo "release.name:  ${{ github.event.release.name }}"
+          echo "release.tag:   ${{ github.event.release.tag_name }}"
+          echo "release.draft: ${{ github.event.release.draft }}"
+          echo "repo:          ${{ github.repository }}"
+
+      - name: Extract version
+        id: ver
+        shell: bash
+        run: |
+          rel_name='${{ github.event.release.name }}'
+          if [ -z "$rel_name" ]; then
+            rel_name='${{ github.event.release.tag_name }}'
+          fi
+
+          version="${rel_name#v}"
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+
+          tag_name="$rel_name"
+          echo "tag_name=$tag_name" >> "$GITHUB_OUTPUT"
+
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Update version information
+        shell: bash
+        run: |
+          set -e
+          v='${{ steps.ver.outputs.version }}'
+          file="metadata.lua"
+          test -f "$file" || { echo "::error::$file nicht gefunden"; exit 1; }
+          sed -i -E 's/(version\s*=\s*")([^"]*)(")/\1'"$v"'\3/' "$file"
+          grep -E 'version\s*=' "$file" || true
+
+      - name: Committen & Push
+        shell: bash
+        run: |
+          set -e
+          if git diff --quiet; then
+            echo "Already up-to-date."
+            exit 0
+          fi
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add metadata.lua
+          git commit -m "chore: bump version to ${{ steps.ver.outputs.version }} (from release '${{ github.event.release.name }}')"
+          git push origin HEAD:main
+
+      - name: Update tag to main (forced)
+        shell: bash
+        run: |
+          set -e
+          tag='${{ steps.ver.outputs.tag_name }}'
+          if [ -z "$tag" ]; then
+            echo "::error::Cannot derive tag/release."
+            exit 1
+          fi
+
+          git fetch --tags
+          git tag -f "$tag"
+          git push -f origin "refs/tags/$tag"
+
+      - name: Update release to point to current release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        shell: bash
+        run: |
+          set -e
+          repo='${{ github.repository }}'
+          rel_id='${{ github.event.release.id }}'
+          tag='${{ steps.ver.outputs.tag_name }}'
+          draft='${{ github.event.release.draft }}'
+
+          body=$(jq -n \
+            --arg tag_name "$tag" \
+            --argjson draft $( [ "$draft" = "true" ] && echo false || echo false ) \
+            '{tag_name: $tag_name, draft: $draft}')
+
+          curl -sS -X PATCH \
+            -H "Authorization: Bearer $GH_TOKEN" \
+            -H "Accept: application/vnd.github+json" \
+            -d "$body" \
+            "https://api.github.com/repos/$repo/releases/$rel_id" \
+            >/dev/null
+
+      - name: Done
+        run: |
+          echo "Version: ${{ steps.ver.outputs.version }}"
+          echo "Tag:     ${{ steps.ver.outputs.tag_name }}"

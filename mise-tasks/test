@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+#MISE description="Run plugin tests - install and execute tool"
+set -euo pipefail
+
+mise plugin link --force mongod .
+mise cache clear
+mise install mongod@latest
+
+# Capture and display the output while also verifying it
+output=$(mise exec "mongod@latest" -- "mongod" --version)
+
+if echo "$output" | grep -q 'db version v'; then
+    echo "✅ Tests passed"
+else
+    echo "❌ Test failed: expected version mongod@latest"
+    echo "Got: $output"
+    exit 1
+fi
