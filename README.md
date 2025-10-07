@@ -45,7 +45,7 @@ You have two options, either use it as a [vfox plugin / directly as a MISE tool]
 
 1. Add a handy alias
    ```shell
-   mise alias set vfox:echocat/mise-plugin-mongod mongod
+   mise alias set vfox:echocat/vfox-mongod mongod
    ```
 
 2. Install the tool into your project
@@ -67,7 +67,7 @@ You have two options, either use it as a [vfox plugin / directly as a MISE tool]
 
 1. Install the plugin (ℹ️ this only needs to be done once per user - **not** per project - it will be installed inside your current user)
    ```shell
-   mise plugin install mongod https://github.com/echocat/mise-plugin-mongod
+   mise plugin install mongod https://github.com/echocat/vfox-mongod
    ```
 
 2. Install the tool into your project
@@ -101,7 +101,7 @@ It uses the [downloads.mongodb.org/full.json](https://downloads.mongodb.org/full
 
 ## Contributing
 
-**mise-plugin-mongod** is an open source project by [echocat](https://echocat.org). So if you want to make this project even better, you can contribute to this project on [Github](https://github.com/echocat/mise-plugin-mongod) by [fork us](https://github.com/echocat/mise-plugin-mongod/fork).
+**vfox-mongod** is an open source project by [echocat](https://echocat.org). So if you want to make this project even better, you can contribute to this project on [Github](https://github.com/echocat/vfox-mongod) by [fork us](https://github.com/echocat/vfox-mongod/fork).
 
 If you commit code to this project, you have to accept that this code will be released under the [license](#license) of this project.
 
