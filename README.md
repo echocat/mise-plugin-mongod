@@ -1,19 +1,47 @@
-# echocat's mongod MISE plugin
+# echocat's mongod vfox plugin
 
-This provides a MISE plugin to use `mongod` and `mongos` in your project as tools.
+This provides a vfox plugin to use `mongod` and `mongos` inside your project as tools. It is compatible with [vfox](https://vfox.dev/) itself and [MISE](https://mise.jdx.dev).
 
 ## TOC
 
-1. [Usage](#usage)
+1. [Usage](#usage) ...with [vfox](#with-vfox) or [MISE](#with-mise)
 2. [FAQ](#faq)
 3. [Contributing](#contributing)
 4. [License](#license)
 
 ## Usage
 
+1. [With vfox](#with-vfox)
+2. [With MISE](#with-mise)
+
+### With vfox
+
+1. Install plugin
+   ```shell
+   vfox add --source https://github.com/echocat/vfox-mongod/archive/refs/tags/<release>.zip mongod
+   ```
+
+2. Install the tool
+    * Always latest version:
+      ```shell
+      vfox install mongod@latest
+      ```
+    * Specific version:
+      ```shell
+      vfox install mongod@8.2.1
+      ```
+
+3. Check if it is working
+   ```shell
+   vfox use mongod@8.2.1
+   mongod --version
+   ```
+
+### With MISE
+
 You have two options, either use it as a [vfox plugin / directly as a MISE tool](#vfox-plugin) or as an [MISE plugin](#mise-plugin).
 
-### vfox Plugin
+#### vfox Plugin
 
 1. Add a handy alias
    ```shell
@@ -35,7 +63,7 @@ You have two options, either use it as a [vfox plugin / directly as a MISE tool]
    mise exec -- mongod --version
    ```
 
-### MISE Plugin
+#### MISE Plugin
 
 1. Install the plugin (ℹ️ this only needs to be done once per user - **not** per project - it will be installed inside your current user)
    ```shell
@@ -58,6 +86,10 @@ You have two options, either use it as a [vfox plugin / directly as a MISE tool]
    ```
 
 ## FAQ
+
+### What is vfox?
+
+See [vfox.dev](https://vfox.dev)
 
 ### What is MISE?
 

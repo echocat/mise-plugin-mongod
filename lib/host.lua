@@ -122,8 +122,34 @@ function host.mise_data_dir()
     return host.mkdirs(host.path_join(share, "mise"))
 end
 
+function host.vfox_cache_dir()
+    local explicit = os.getenv("VFOX_CACHE")
+    if explicit then
+        return host.mkdirs(explicit)
+    end
+
+    local home = os.getenv("VFOX_HOME")
+    if not home then
+        local user_home = os.getenv("HOME")
+        if RUNTIME.osType:lower() == "windows" then
+            user_home = os.getenv("USERPROFILE")
+        end
+        if not user_home then
+            user_home = "~"
+        end
+        home = host.path_join(user_home, ".version-fox")
+    end
+
+    return host.path_join(home, "cache")
+end
+
 function host.cache_dir()
-    return host.mkdirs(host.path_join(host.mise_data_dir(), ".cached", "plugins", "mongod"))
+    if os.getenv("MISE_PROJECT_ROOT") then
+        -- We're executed inside MISE... use this one as base.
+        return host.mkdirs(host.path_join(host.mise_data_dir(), ".cache", "echocat-vfox-mongod"))
+    end
+
+    return host.mkdirs(host.path_join(host.vfox_cache_dir(), "echocat-vfox-mongod"))
 end
 
 function host.os()
