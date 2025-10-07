@@ -1,7 +1,6 @@
 function PLUGIN:PostInstall(ctx)
     local archiver = require("archiver")
     local cmd = require("cmd")
-    local file = require("file")
     local host = require("host")
     local versions = require("versions")
 
@@ -14,7 +13,7 @@ function PLUGIN:PostInstall(ctx)
     --
     -- ...because not all archives are extracted automatically. Especially not: .tgz :-(
 
-    local origArchiveFn = file.join_path(path, version.url:match("([^/\\]+)$"))
+    local origArchiveFn = host.path_join(path, version.url:match("([^/\\]+)$"))
     local archiveFn = origArchiveFn:gsub("%.tgz$", ".tar.gz")
 
     -- This will only work, if both file names are different.
@@ -43,8 +42,8 @@ find '%s' -mindepth 1 -maxdepth 1 -type d -empty -delete 2>/dev/null
     -- END: Ugly workaround
     -- --------------------------------------------------------------------------------------------------
 
-    local exe = file.join_path(path, "bin", host.with_exec_ext("mongod"))
-    local success, err = pcall(cmd.exec, exe .. " -version")
+    local exe = host.path_join(path, "bin", host.with_exec_ext("mongod"))
+    local success, err = pcall(host.exec, exe .. " -version")
     if not success then
         error(string.format("%s installation appears to be broken: got error while testing %s: %s", PLUGIN.name, exe, tostring(err)))
     end

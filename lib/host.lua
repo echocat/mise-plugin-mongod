@@ -1,5 +1,3 @@
-local file = require("file")
-
 local host = {}
 
 function id_match(what, id, id_like)
@@ -7,6 +5,31 @@ function id_match(what, id, id_like)
         return true
     end
     return id_like:match("(^" .. what .. "%s)|(%s" .. what .. "%s)|(%s" .. what .. "$)|(^" .. what .. "$)")
+end
+
+function host.path_join(...)
+    local sep = package.config:sub(1, 1)  -- unter Windows: "\", sonst "/"
+    local parts = { ... }
+    local path = table.concat(parts, sep)
+
+    path = path:gsub(sep .. "+", sep)
+
+    if sep == "\\" then
+        path = path:gsub("/", "\\")
+    end
+
+    return path
+end
+
+function host.read_file(path)
+    local f, err = io.open(path, "r")
+    if not f then
+        return nil, string.format("Cannot open %q: %s", path, tostring(err))
+    end
+
+    local content = f:read("*a")
+    f:close()
+    return content
 end
 
 function host.exec_ext()
@@ -82,9 +105,9 @@ function host.mise_data_dir()
     if RUNTIME.osType:lower() == "windows" then
         local lad = os.getenv("LOCALAPPDATA")
         if not lad then
-            lad = file.join_path(os.getenv("USERPROFILE"), "AppData", "Local")
+            lad = host.path_join(os.getenv("USERPROFILE"), "AppData", "Local")
         end
-        return host.mkdirs(file.join_path(lad, "mise"))
+        return host.mkdirs(host.path_join(lad, "mise"))
     end
 
     local share = os.getenv("XDG_DATA_HOME")
@@ -93,14 +116,40 @@ function host.mise_data_dir()
         if not hd then
             hd = "~"
         end
-        share = file.join_path(hd, ".local", "share")
+        share = host.path_join(hd, ".local", "share")
     end
 
-    return host.mkdirs(file.join_path(share, "mise"))
+    return host.mkdirs(host.path_join(share, "mise"))
+end
+
+function host.vfox_cache_dir()
+    local explicit = os.getenv("VFOX_CACHE")
+    if explicit then
+        return host.mkdirs(explicit)
+    end
+
+    local home = os.getenv("VFOX_HOME")
+    if not home then
+        local user_home = os.getenv("HOME")
+        if RUNTIME.osType:lower() == "windows" then
+            user_home = os.getenv("USERPROFILE")
+        end
+        if not user_home then
+            user_home = "~"
+        end
+        home = host.path_join(user_home, ".version-fox")
+    end
+
+    return host.path_join(home, "cache")
 end
 
 function host.cache_dir()
-    return host.mkdirs(file.join_path(host.mise_data_dir(), ".cached", "plugins", "mongod"))
+    if os.getenv("MISE_PROJECT_ROOT") then
+        -- We're executed inside MISE... use this one as base.
+        return host.mkdirs(host.path_join(host.mise_data_dir(), ".cache", "echocat-vfox-mongod"))
+    end
+
+    return host.mkdirs(host.path_join(host.vfox_cache_dir(), "echocat-vfox-mongod"))
 end
 
 function host.os()
@@ -143,7 +192,7 @@ function host.target()
     end
 
     if osn == "linux" then
-        local osr = file.read("/etc/os-release")
+        local osr = host.read_file("/etc/os-release")
         local id = osr:match('^ID="?(.-)"?\n') or osr:match('\nID="?(.-)"?\n')
         local id_like = osr:match('^ID_LIKE="?(.-)"?\n') or osr:match('\nID_LIKE="?(.-)"?\n')
         if not id then
