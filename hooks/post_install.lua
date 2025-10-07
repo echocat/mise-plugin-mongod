@@ -1,6 +1,9 @@
 function PLUGIN:PostInstall(ctx)
-    local archiver = require("archiver")
-    local cmd = require("cmd")
+    local raOk, archiver = pcall(require,"vfox.archiver")
+    if not raOk then
+        archiver = require("archiver")
+    end
+
     local host = require("host")
     local versions = require("versions")
 
@@ -19,24 +22,24 @@ function PLUGIN:PostInstall(ctx)
     -- This will only work, if both file names are different.
     if origArchiveFn ~= archiveFn then
         host.mv(origArchiveFn, archiveFn)
-    end
 
-    local adOk = pcall(archiver.decompress, archiveFn, path)
-    if adOk then
-        if RUNTIME.osType:lower() == "windows" then
-            error("The workaround is currently not implemented in Windows.")
-        end
+        local adOk = pcall(archiver.decompress, archiveFn, path)
+        if adOk then
+            if RUNTIME.osType:lower() == "windows" then
+                error("The workaround is currently not implemented in Windows.")
+            end
 
-        host.rm(archiveFn)
-        -- Now move all contents from within up...
-        host.exec(([[
+            host.rm(archiveFn)
+            -- Now move all contents from within up...
+            host.exec(([[
 find '%s' -mindepth 1 -maxdepth 1 -type d | while read -r dir; do
 find "$dir" -mindepth 1 -maxdepth 1 -exec mv -f {} '%s' \;
 done 2>/dev/null
 ]]):format(path:gsub("'", "\\'"), path:gsub("'", "\\'")))
-        host.exec(([[
+            host.exec(([[
 find '%s' -mindepth 1 -maxdepth 1 -type d -empty -delete 2>/dev/null
 ]]):format(path:gsub("'", "\\'")))
+        end
     end
 
     -- END: Ugly workaround

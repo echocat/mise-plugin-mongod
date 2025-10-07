@@ -68,7 +68,7 @@ end
 
 function host.mkdirs(name)
     if RUNTIME.osType:lower() == "windows" then
-        host.exec(string.format('powershell -NoProfile -Command "New-Item -ItemType Directory -Force -Path "%s" | Out-Null"', name))
+        host.exec(string.format([[powershell -NoProfile -Command ^New-Item -ItemType Directory -Force -Path '%s' ^| Out-Null^]], name))
         return name
     end
 
@@ -78,7 +78,7 @@ end
 
 function host.mv(old, new)
     if RUNTIME.osType:lower() == "windows" then
-        host.exec(string.format('powershell -NoProfile -Command "Move-Item -Path "%s" -Destination "%s" | Out-Null"', old, new))
+        host.exec(string.format([[powershell -NoProfile -Command ^Move-Item -Path '%s' -Destination '%s' ^| Out-Null^]], old, new))
         return name
     end
 
@@ -88,7 +88,7 @@ end
 
 function host.rm(name)
     if RUNTIME.osType:lower() == "windows" then
-        host.exec(string.format('powershell -NoProfile -Command "Remove-Item -LiteralPath -Recurse -Force -ErrorAction SilentlyContinue -LiteralPath "%s" | Out-Null"', name))
+        host.exec(string.format([[powershell -NoProfile -Command ^Remove-Item -LiteralPath -Recurse -Force -ErrorAction SilentlyContinue -LiteralPath '%s' ^| Out-Null^]], name))
         return name
     end
 
@@ -96,10 +96,10 @@ function host.rm(name)
     return name
 end
 
-function host.mise_data_dir()
+function mise_data_dir()
     local explicit = os.getenv("MISE_DATA_DIR")
     if explicit then
-        return host.mkdirs(explicit)
+        return explicit
     end
 
     if RUNTIME.osType:lower() == "windows" then
@@ -107,7 +107,7 @@ function host.mise_data_dir()
         if not lad then
             lad = host.path_join(os.getenv("USERPROFILE"), "AppData", "Local")
         end
-        return host.mkdirs(host.path_join(lad, "mise"))
+        return host.path_join(lad, "mise")
     end
 
     local share = os.getenv("XDG_DATA_HOME")
@@ -119,13 +119,17 @@ function host.mise_data_dir()
         share = host.path_join(hd, ".local", "share")
     end
 
-    return host.mkdirs(host.path_join(share, "mise"))
+    return host.path_join(share, "mise")
 end
 
-function host.vfox_cache_dir()
+function mise_download_dir()
+    return host.path_join(mise_data_dir(), "downloads")
+end
+
+function vfox_cache_dir()
     local explicit = os.getenv("VFOX_CACHE")
     if explicit then
-        return host.mkdirs(explicit)
+        return explicit
     end
 
     local home = os.getenv("VFOX_HOME")
@@ -144,12 +148,16 @@ function host.vfox_cache_dir()
 end
 
 function host.cache_dir()
-    if os.getenv("MISE_PROJECT_ROOT") then
-        -- We're executed inside MISE... use this one as base.
-        return host.mkdirs(host.path_join(host.mise_data_dir(), ".cache", "echocat-vfox-mongod"))
+    local base
+    local raOk = pcall(require,"archiver")
+    if raOk then
+        -- We're executed inside MISE... use this one as base. Because there does archiver does exist. In vfox not.
+        base = mise_download_dir()
+    else
+        base = vfox_cache_dir()
     end
 
-    return host.mkdirs(host.path_join(host.vfox_cache_dir(), "echocat-vfox-mongod"))
+    return host.mkdirs(host.path_join(base, "echocat-vfox-mongod"))
 end
 
 function host.os()
