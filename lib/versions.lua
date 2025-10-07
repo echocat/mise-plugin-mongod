@@ -1,7 +1,6 @@
 local http = require("http")
 local json = require("json")
 local host = require("host")
-local file = require("file")
 
 local versions = {}
 
@@ -70,7 +69,7 @@ function cache_file_name()
     local target = host.target()
     local arch = host.arch()
 
-    return file.join_path(cache_dir, "versions-" .. target .. "-" .. arch .. ".json")
+    return host.path_join(cache_dir, "versions-" .. target .. "-" .. arch .. ".json")
 end
 
 function get_all()
@@ -78,8 +77,8 @@ function get_all()
     local cache_fn = cache_file_name()
 
     local cache
-    local rfOk, cache_json = pcall(file.read, cache_fn)
-    if rfOk then
+    local cache_json, _ = host.read_file(cache_fn)
+    if cache_json then
         local djOk, cached = pcall(json.decode, cache_json)
         if djOk and cached.created and (now - cached.created) < cache_ttl then
             cache = cached
