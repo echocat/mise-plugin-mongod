@@ -30,6 +30,10 @@ jobs:
 
           version="${rel_name#v}"
           echo "version=$version" >> "$GITHUB_OUTPUT"
+          
+          with_v='${{ github.event.release.tag_name }}'
+          if [ -z "$with_v" ]; then with_v="v$version"; fi
+          echo "tag_with_v=$with_v" >> "$GITHUB_OUTPUT"
 
           tag_name="$rel_name"
           echo "tag_name=$tag_name" >> "$GITHUB_OUTPUT"
@@ -50,6 +54,32 @@ jobs:
           sed -i -E 's/(version\s*=\s*")([^"]*)(")/\1'"$v"'\3/' "$file"
           grep -E 'version\s*=' "$file" || true
 
+      - name: Write manifest.json (overwrite)
+        shell: bash
+        run: |
+          set -e
+          repo='${{ github.repository }}'
+          v_no='${{ steps.ver.outputs.version }}'
+          v_with='${{ steps.ver.outputs.tag_with_v }}'
+
+          # manifest.json schreiben (Arrays via --argjson)
+          jq -n \
+            --arg manifestUrl "https://raw.githubusercontent.com/$repo/refs/heads/main/manifest.json" \
+            --arg description "A mise tool plugin for mongod" \
+            --arg downloadUrl "https://github.com/$repo/releases/download/$v_with/vfox-mongod-$v_no.zip" \
+            --arg minRuntimeVersion "0.5.0" \
+            --arg name "mongod" \
+            --arg homepage "https://github.com/$repo" \
+            --arg license "MIT" \
+            --arg version "$v_no" \
+            --argjson notes '[]' \
+            --argjson legacyFilenames '[]' \
+            '{manifestUrl:$manifestUrl, notes:$notes, description:$description, downloadUrl:$downloadUrl, minRuntimeVersion:$minRuntimeVersion, name:$name, homepage:$homepage, license:$license, legacyFilenames:$legacyFilenames, version:$version}' \
+            > manifest.json
+
+          echo "Wrote manifest.json:"
+          cat manifest.json
+
       - name: Committen & Push
         shell: bash
         run: |
@@ -60,7 +90,7 @@ jobs:
           fi
           git config user.name  "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add metadata.lua
+          git add metadata.lua manifest.json
           git commit -m "chore: bump version to ${{ steps.ver.outputs.version }} (from release '${{ github.event.release.name }}')"
           git push origin HEAD:main
 
@@ -101,7 +131,28 @@ jobs:
             "https://api.github.com/repos/$repo/releases/$rel_id" \
             >/dev/null
 
+      - name: Build Package
+        shell: bash
+        run: |
+          set -e
+          zipname="vfox-mongod-${{ steps.ver.outputs.version }}.zip"
+          zip -r "$zipname" . -x ".git/*"
+          echo "zipname=$zipname" >> "$GITHUB_OUTPUT"
+        id: zip
+
+      - name: Upload Package
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        shell: bash
+        run: |
+          set -e
+          repo='${{ github.repository }}'
+          tag='${{ steps.ver.outputs.tag_name }}'
+          asset='${{ steps.zip.outputs.zipname }}'
+          gh release upload "$tag" "$asset" --clobber --repo "$repo"
+
       - name: Done
         run: |
           echo "Version: ${{ steps.ver.outputs.version }}"
           echo "Tag:     ${{ steps.ver.outputs.tag_name }}"
+          echo "ZIP:     ${{  steps.zip.outputs.zipname }}"
