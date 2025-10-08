@@ -4,6 +4,10 @@ function id_match(what, id, id_like)
     if what == id then
         return true
     end
+
+    if not id_like then
+        return false
+    end
     return id_like:match("(^" .. what .. "%s)|(%s" .. what .. "%s)|(%s" .. what .. "$)|(^" .. what .. "$)")
 end
 
