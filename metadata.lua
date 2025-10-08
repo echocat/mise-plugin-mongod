@@ -1,6 +1,6 @@
 PLUGIN = { -- luacheck: ignore
     name = "mongod",
-    version = "1.2.2",
+    version = "1.2.3",
     description = "A mise tool plugin for mongod",
     author = "echocat",
     updateUrl = "https://github.com/echocat/vfox-mongod",
