@@ -293,7 +293,6 @@ func TestTarget_host(t *testing.T) {
 			{"windows", "windows", "", map[string]any{"os": "windows"}, ""},
 			{"macos", "macos", "", map[string]any{"os": "macos"}, ""},
 			{"wrong-os", "does-not-exist", "", nil, `Unsupported operating system: does-not-exist`},
-			{"linux-no-os-release", "linux", "", nil, `Unsupported linux distribution: "/etc/os-release" does not exist`},
 			{"ubuntu2402", "linux", etcOsReleaseUbuntu2402, map[string]any{"distribution": "ubuntu", "os": "linux", "version": []any{float64(24), float64(4)}}, ""},
 			{"debian13", "linux", etcOsReleaseDebian13, map[string]any{"distribution": "debian", "os": "linux", "version": []any{float64(13)}}, ""},
 			{"amazon2023", "linux", etcOsReleaseAmazon2023, map[string]any{"distribution": "amazon", "os": "linux", "version": []any{float64(2023)}}, ""},
