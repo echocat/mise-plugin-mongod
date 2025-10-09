@@ -88,8 +88,8 @@ jobs:
             echo "Already up-to-date."
             exit 0
           fi
-          git config user.name  "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git config user.name  "echocat Bot"
+          git config user.email "contact@echocat.org"
           git add metadata.lua manifest.json
           git commit -m "chore: bump version to ${{ steps.ver.outputs.version }} (from release '${{ github.event.release.name }}')"
           git push origin HEAD:main
