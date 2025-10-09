@@ -1,6 +1,7 @@
 function PLUGIN:PreInstall(ctx)
     local versions = require("versions")
     local host = require("host")
+    local Target = require("Target")
 
     local version = versions.get(ctx.version)
 
@@ -8,6 +9,6 @@ function PLUGIN:PreInstall(ctx)
         version = version.version,
         url = version.url,
         sha256 = version.sha256,
-        note = string.format("Downloading %s/%s@%s ", host.target(), host.arch(), version.version),
+        note = string.format("Downloading %s/%s@%s ", Target.host_string(), host.arch(), version.version),
     }
 end
