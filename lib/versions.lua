@@ -52,8 +52,8 @@ function versions.__fetch()
                                 target_version = target.version,
                                 download = download
                             }
-                        elseif target:equals_base(download_target) and download_target.version and Version.cmp(target.version, download_target.version) > 0 then
-                            if not candidate or Version.cmp(download_target.version, candidate.version) > 0 then
+                        elseif target:equals_base(download_target) and download_target.version and Version.cmp(target.version, download_target.version) >= 0 then
+                            if not candidate or Version.cmp(download_target.version, candidate.target_version) > 0 then
                                 candidate = {
                                     target_version = download_target.version,
                                     download = download
