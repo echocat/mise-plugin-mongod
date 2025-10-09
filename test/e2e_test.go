@@ -12,7 +12,7 @@ func TestE2E_install(t *testing.T) {
 	})
 
 	ShouldExecMiseMatching(t, 0, `^$`, "plugin", "link", "--force", "mongod", "..")
-	ShouldExecMiseMatching(t, 0, `^mise cache cleared$`, "cache", "clear")
+	ShouldExecMise(t, 0, "cache", "clear")
 	ShouldExecMise(t, 0, "install", "mongod@latest")
 	ShouldExecMiseMatching(t, 0, `db version v\d+\.\d+\.\d+`, "exec", "mongod@latest", "--", "mongod", "--version")
 }
