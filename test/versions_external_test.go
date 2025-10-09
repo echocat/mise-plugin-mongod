@@ -66,9 +66,9 @@ func TestVersions_fetch_ubuntu2402_External(t *testing.T) {
 	assert.Equal(t, "lts", actualVersion["note"])
 	assert.Equal(t, "https://docs.mongodb.org/master/release-notes/8.0/", actualVersion["release_notes"])
 	assert.Equal(t, "targeted", actualVersion["edition"])
-	assert.Equal(t, "https://fastdl.mongodb.org/linux/mongodb-linux-aarch64-ubuntu2004-8.0.0.tgz", actualVersion["url"])
-	assert.Equal(t, "45d10603c349538b27d5399317ec1d29af92bdb8", actualVersion["sha1"])
-	assert.Equal(t, "2ba041a9c5de5271b65969e201e2dcdb773fa45d0de1e1d52cf937592d315a73", actualVersion["sha256"])
+	assert.Equal(t, "https://fastdl.mongodb.org/linux/mongodb-linux-aarch64-ubuntu2404-8.0.0.tgz", actualVersion["url"])
+	assert.Equal(t, "0598b0b60f09d13ce58c788603b6867b85dc7f19", actualVersion["sha1"])
+	assert.Equal(t, "6db634b3e6a0008722545bbd86f91ef27a6f428b37f4ee5479a0496afe50e7af", actualVersion["sha256"])
 }
 
 func TestVersions_fetch_debian12_External(t *testing.T) {
