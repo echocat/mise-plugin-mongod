@@ -21,7 +21,7 @@ run = "gotestsum -- ./..."
 [tasks."test:external"]
 description = "Runs all external tests"
 dir = "test"
-run = "gotestsum -- -tags test_e2e -run 'External$' ./..."
+run = "gotestsum -- -tags test_external -run 'External$' ./..."
 run_windows = "gotestsum -- -tags test_external -run External$ ./..."
 
 [tasks."test:e2e"]
