@@ -2,6 +2,8 @@
 
 This provides a vfox plugin to use `mongod` and `mongos` inside your project as tools. It is compatible with [vfox](https://vfox.dev/) itself and [MISE](https://mise.jdx.dev).
 
+The actual target for the given MongoDB version will be resolved based on your operating-system **and** distribution (if applicable) **and** os/distribution version (if applicable). This is especially important for Linux distributions, where a big variety of packages for different distributions exists for `mongod`/`mongos`.
+
 ## TOC
 
 1. [Usage](#usage) ...with [vfox](#with-vfox) or [MISE](#with-mise)
@@ -86,6 +88,12 @@ You have two options, either use it as a [vfox plugin / directly as a MISE tool]
    ```
 
 ## FAQ
+
+### Can I overwrite the target which will be picked?
+
+Usually the target (like `ubuntu2404`, `windows`, `macos`, ...) will be resolved automatically. Not always this matches 100% what you want. In this case you can overwrite this selection (on your host) by setting the environment variable `MONGOD_TARGET` to your desired target. It has to match the targets you can also find inside [downloads.mongodb.org/full.json](https://downloads.mongodb.org/full.json).
+
+But: If there is something missing, please [create a ticket](https://github.com/echocat/vfox-mongod/issues) that we can implement it.
 
 ### What is vfox?
 
