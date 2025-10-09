@@ -9,6 +9,6 @@ function PLUGIN:PreInstall(ctx)
         version = version.version,
         url = version.url,
         sha256 = version.sha256,
-        note = string.format("Downloading %s/%s@%s ", Target.target(), host.arch(), version.version),
+        note = string.format("Downloading %s/%s@%s ", Target.host_string(), host.arch(), version.version),
     }
 end
