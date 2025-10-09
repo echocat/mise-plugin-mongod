@@ -224,6 +224,11 @@ function Target:equals(other)
     return Version.cmp(self.version, other.version) == 0
 end
 
+local function safeget(o, key)
+  local ok, res = pcall(function() return o[key] end)
+  return ok and res or nil
+end
+
 function Target.host(os, os_release_fn)
     local overwriteEnv = cos.getenv("MONGOD_TARGET")
     if overwriteEnv then
@@ -242,7 +247,7 @@ function Target.host(os, os_release_fn)
 
     if os == "linux" then
         -- The following is only used in tests...
-        local distributionOverwrite, versionOverwrite = RUNTIME.distributionType, RUNTIME.distributionVersion
+        local distributionOverwrite, versionOverwrite = safeget(RUNTIME, "distributionType"), safeget(RUNTIME, "distributionVersion")
         if distributionOverwrite and versionOverwrite then
             local version = Version:new(versionOverwrite)
             return Target:new({
