@@ -46,12 +46,12 @@ func TestE2E_vfox_install(t *testing.T) {
 		_ = os.Remove(pluginMountDir)
 	})
 
-	ShouldExec(t, 0, "vfox", "install", "mongod@8.2.1")
+	installRsp := ShouldExec(t, 0, "vfox", "install", "mongod@8.2.1")
 	rspJson := ShouldExec(t, 0, "vfox", "env", "--json", "mongod@8.2.1")
 	var rsp vfoxEnvResponse
 	err = json.Unmarshal([]byte(rspJson), &rsp)
 	require.NoError(t, err, "Should be able to unmarshal json.")
-	require.Len(t, rsp.Paths, 1, "Should have the path for mongod, but was: %s", rspJson)
+	require.Len(t, rsp.Paths, 1, "Should have the path for mongod, but was: %s\n\nGot following while installing: %s", rspJson, installRsp)
 	mongodExe := filepath.Join(rsp.Paths[0], "mongod")
 
 	ShouldMatching(t, 0, `db version v\d+\.\d+\.\d+`, mongodExe, "--version")
