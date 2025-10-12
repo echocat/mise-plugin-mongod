@@ -136,10 +136,17 @@ function vfox_cache_dir()
     return host.path_join(home, "cache")
 end
 
-function host.cache_dir()
-    local base
+function host.is_mise()
     local raOk = pcall(require, "archiver")
     if raOk then
+        return true
+    end
+    return false
+end
+
+function host.cache_dir()
+    local base
+    if host.is_mise() then
         -- We're executed inside MISE... use this one as base. Because there does archiver does exist. In vfox not.
         base = mise_cache_dir()
     else

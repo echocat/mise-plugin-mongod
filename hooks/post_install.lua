@@ -14,13 +14,13 @@ function PLUGIN:PostInstall(ctx)
     -- --------------------------------------------------------------------------------------------------
     -- BEGIN: Ugly workaround
     --
-    -- ...because not all archives are extracted automatically. Especially not: .tgz :-(
+    -- ...because not all archives are extracted automatically by MISE. Especially not: .tgz :-(
 
     local origArchiveFn = host.path_join(path, version.url:match("([^/\\]+)$"))
     local archiveFn = origArchiveFn:gsub("%.tgz$", ".tar.gz")
 
-    -- This will only work, if both file names are different.
-    if origArchiveFn ~= archiveFn then
+    -- This will only work within MISE and if both file names are different.
+    if host.is_mise() and origArchiveFn ~= archiveFn then
         host.mv(origArchiveFn, archiveFn)
 
         local adOk = pcall(archiver.decompress, archiveFn, path)
