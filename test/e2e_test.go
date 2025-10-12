@@ -51,7 +51,7 @@ func TestE2E_vfox_install(t *testing.T) {
 	var rsp vfoxEnvResponse
 	err = json.Unmarshal([]byte(rspJson), &rsp)
 	require.NoError(t, err, "Should be able to unmarshal json.")
-	require.Len(t, rsp.Paths, 1)
+	require.Len(t, rsp.Paths, 1, "Should have the path for mongod, but was: %s", rspJson)
 	mongodExe := filepath.Join(rsp.Paths[0], "mongod")
 
 	ShouldMatching(t, 0, `db version v\d+\.\d+\.\d+`, mongodExe, "--version")
