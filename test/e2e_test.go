@@ -32,7 +32,11 @@ func TestE2E_vfox_install(t *testing.T) {
 	uh, err := user.Current()
 	require.NoError(t, err, "Should get current user home directory.")
 
-	pluginMountDir := filepath.Join(uh.HomeDir, ".version-fox", "plugin", "mongod")
+	pluginDir := filepath.Join(uh.HomeDir, ".version-fox", "plugin")
+	err = os.MkdirAll(pluginDir, 0755)
+	require.NoError(t, err, "Should create %s directory.", pluginDir)
+
+	pluginMountDir := filepath.Join(pluginDir, "mongod")
 	_ = os.Remove(pluginMountDir)
 	err = os.Symlink(root, pluginMountDir)
 	require.NoError(t, err, "Should create symlink %s => %s.", root, pluginMountDir)
