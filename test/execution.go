@@ -11,12 +11,12 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func ExecMise(t testing.TB, args ...string) (string, int) {
+func Exec(t testing.TB, prg string, args ...string) (string, int) {
 	t.Helper()
 	HookLogger(t)
 
-	path, err := exec.LookPath("mise")
-	require.NoError(t, err, "Should be able to find mise executable in PATH.")
+	path, err := exec.LookPath(prg)
+	require.NoError(t, err, "Should be able to find %s executable in PATH.", prg)
 
 	var output bytes.Buffer
 
@@ -30,7 +30,7 @@ func ExecMise(t testing.TB, args ...string) (string, int) {
 	if errors.As(err, &exitErr) {
 		exitCode = exitErr.ExitCode()
 	} else {
-		require.NoError(t, err, "Should be able to run mise without error.")
+		require.NoError(t, err, "Should be able to run %s without error.", prg)
 	}
 
 	result := strings.TrimSpace(output.String())
@@ -42,18 +42,18 @@ func ExecMise(t testing.TB, args ...string) (string, int) {
 	return result, exitCode
 }
 
-func ShouldExecMise(t testing.TB, expectedCode int, args ...string) string {
+func ShouldExec(t testing.TB, expectedCode int, prg string, args ...string) string {
 	t.Helper()
-	output, code := ExecMise(t, args...)
+	output, code := Exec(t, prg, args...)
 	if code != expectedCode {
 		t.Errorf("stdout/stderr:\n%s", output)
-		require.Equal(t, expectedCode, code, "mise %v should exit with %d", args, expectedCode)
+		require.Equal(t, expectedCode, code, "%s %v should exit with %d", prg, args, expectedCode)
 	}
 	return output
 }
 
-func ShouldExecMiseMatching(t testing.TB, expectedCode int, contentMatching string, args ...string) {
+func ShouldMatching(t testing.TB, expectedCode int, contentMatching string, prg string, args ...string) {
 	t.Helper()
-	output := ShouldExecMise(t, expectedCode, args...)
-	require.Regexp(t, contentMatching, output, "mise %v should match %s", args, contentMatching)
+	output := ShouldExec(t, expectedCode, prg, args...)
+	require.Regexp(t, contentMatching, output, "%s %v should match %s", args, prg, contentMatching)
 }

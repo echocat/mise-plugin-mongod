@@ -3,16 +3,47 @@
 package test
 
 import (
+	"os"
+	"os/user"
+	"path/filepath"
 	"testing"
+
+	"github.com/stretchr/testify/require"
 )
 
-func TestE2E_install(t *testing.T) {
+func TestE2E_mise_install(t *testing.T) {
 	t.Cleanup(func() {
-		_, _ = ExecMise(t, "plugin", "uninstall", "mongod")
+		Exec(t, "mise", "uninstall", "mongod")
+		Exec(t, "mise", "plugin", "uninstall", "mongod")
 	})
 
-	ShouldExecMiseMatching(t, 0, `^$`, "plugin", "link", "--force", "mongod", "..")
-	ShouldExecMise(t, 0, "cache", "clear")
-	ShouldExecMise(t, 0, "install", "mongod@latest")
-	ShouldExecMiseMatching(t, 0, `db version v\d+\.\d+\.\d+`, "exec", "mongod@latest", "--", "mongod", "--version")
+	ShouldExec(t, 0, "mise", "plugin", "link", "--force", "mongod", "..")
+	ShouldExec(t, 0, "mise", "cache", "clear")
+	ShouldExec(t, 0, "mise", "install", "mongod@latest")
+	ShouldMatching(t, 0, `db version v\d+\.\d+\.\d+`, "mise", "exec", "mongod@latest", "--", "mongod", "--version")
+}
+
+func TestE2E_vfox_install(t *testing.T) {
+	root, err := os.Getwd()
+	require.NoError(t, err, "Should get current working directory.")
+	root = filepath.Dir(root)
+
+	uh, err := user.Current()
+	require.NoError(t, err, "Should get current user home directory.")
+
+	pluginDir := filepath.Join(uh.HomeDir, ".version-fox", "plugin")
+	err = os.MkdirAll(pluginDir, 0755)
+	require.NoError(t, err, "Should create %s directory.", pluginDir)
+
+	pluginMountDir := filepath.Join(pluginDir, "mongod")
+	_ = os.Remove(pluginMountDir)
+	err = os.Symlink(root, pluginMountDir)
+	require.NoError(t, err, "Should create symlink %s => %s.", root, pluginMountDir)
+
+	t.Cleanup(func() {
+		Exec(t, "vfox", "uninstall", "mongod")
+		_ = os.Remove(pluginMountDir)
+	})
+
+	ShouldExec(t, 0, "vfox", "install", "mongod@8.2.1")
 }
