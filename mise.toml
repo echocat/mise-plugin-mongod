@@ -38,6 +38,7 @@ run = [
 [tools]
 stylua = "latest"
 go = "latest"
+vfox = "latest"
 
 [tools.gotestsum]
 version = "latest"
