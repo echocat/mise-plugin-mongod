@@ -193,7 +193,14 @@ function host.os()
 end
 
 function host.arch()
-    local plain = RUNTIME.archType:lower()
+    local plain = os.getenv("MONGOD_ARCH")
+    if not plain then
+        plain = RUNTIME.archType:lower()
+    end
+
+    if plain == "s390x" or plain == "ppc64le" then
+        return plain
+    end
 
     if plain == "x86_64" or plain == "amd64" or plain == "x64" then
         return "x86_64"

@@ -2,14 +2,26 @@
 
 This provides a vfox plugin to use `mongod` and `mongos` inside your project as tools. It is compatible with [vfox](https://vfox.dev/) itself and [MISE](https://mise.jdx.dev).
 
-The actual target for the given MongoDB version will be resolved based on your operating-system **and** distribution (if applicable) **and** os/distribution version (if applicable). This is especially important for Linux distributions, where a big variety of packages for different distributions exists for `mongod`/`mongos`.
-
 ## TOC
 
-1. [Usage](#usage) ...with [vfox](#with-vfox) or [MISE](#with-mise)
-2. [FAQ](#faq)
-3. [Contributing](#contributing)
-4. [License](#license)
+1. [Environment](#environment)
+2. [Usage](#usage) ...with [vfox](#with-vfox) or [MISE](#with-mise)
+3. [FAQ](#faq)
+4. [Contributing](#contributing)
+5. [License](#license)
+
+## Environment
+
+The actual target and architecture for the given MongoDB version will be resolved based on your operating-system **and** architecture **and** distribution (if applicable) **and** os/distribution version (if applicable). This is especially important for Linux distributions, where a big variety of packages for different distributions exists for `mongod`/`mongos`.
+
+But: If there is something missing, please [create a ticket](https://github.com/echocat/vfox-mongod/issues) that we can implement it.
+
+### Overrides
+
+| Environment Variable | Description |
+| -- | -- |
+| `MONGOD_TARGET` | This will override the automatically resolved target (like `ubuntu2404`, `windows`, `macos`, ...). All available lists of targets are listed inside [downloads.mongodb.org/full.json](https://downloads.mongodb.org/full.json). |
+| `MONGOD_ARCH` | This will override the architecture. Can be (currently) `amd64`, `arm`, `arm64`, `s390x` and `ppc64le`. |
 
 ## Usage
 
@@ -89,11 +101,9 @@ You have two options, either use it as a [vfox plugin / directly as a MISE tool]
 
 ## FAQ
 
-### Can I overwrite the target which will be picked?
+### Can I override the target which will be picked?
 
-Usually the target (like `ubuntu2404`, `windows`, `macos`, ...) will be resolved automatically. Not always this matches 100% what you want. In this case you can overwrite this selection (on your host) by setting the environment variable `MONGOD_TARGET` to your desired target. It has to match the targets you can also find inside [downloads.mongodb.org/full.json](https://downloads.mongodb.org/full.json).
-
-But: If there is something missing, please [create a ticket](https://github.com/echocat/vfox-mongod/issues) that we can implement it.
+See [Environment -> Overrides](#overrides).
 
 ### What is vfox?
 
