@@ -29,6 +29,7 @@ jobs:
         uses: jdx/mise-action@v2
         with:
           version: ${{ matrix.mise-version }}
+          cache: false
 
       - name: Run tests
         run: mise run ci
