@@ -193,7 +193,7 @@ function host.os()
 end
 
 function host.arch()
-    local plain = cos.getenv("MONGOD_ARCH")
+    local plain = os.getenv("MONGOD_ARCH")
     if not plain then
         plain = RUNTIME.archType:lower()
     end
