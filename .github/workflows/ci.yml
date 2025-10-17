@@ -26,6 +26,8 @@ jobs:
 
       - name: Install MISE
         uses: jdx/mise-action@v2
+        with:
+          version: latest
 
       - name: Run tests
         run: mise run ci
