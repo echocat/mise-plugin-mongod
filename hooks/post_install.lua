@@ -17,12 +17,13 @@ end
 --
 -- ...because MISE prior 2025.10.8 cannot extract .tgz archives :-(
 function apply_ugly_workaround_if_required(sdkInfo)
+    local host = require("host")
+
     -- If this not not MISE (usually vfox directly), immediately return...
     if not host.is_mise() then
         return
     end
 
-    local host = require("host")
     local versions = require("versions")
     local archiver = require("archiver")
 
