@@ -25,6 +25,15 @@ function host.read_file(path)
     return content, nil
 end
 
+function host.can_read(path)
+    local f = io.open(path, "r")
+    if not f then
+        return false
+    end
+    f:close()
+    return true
+end
+
 function host.exec_ext()
     if RUNTIME.osType:lower() == "windows" then
         return ".exe"
@@ -39,7 +48,16 @@ function host.with_exec_ext(fn)
 end
 
 function host.exec(command)
-    local ok, cause, code = os.execute(command)
+    local cmd = command .. " 2>&1"
+
+    local handle = io.popen(cmd)
+    if not handle then
+        error(string.format("Failed to execute command: %q", command))
+    end
+
+    local output = handle:read("*a")
+    local ok, cause, code = handle:close()
+
     if type(ok) == "number" then
         code = ok
         if ok == 0 then
@@ -50,18 +68,21 @@ function host.exec(command)
     end
 
     if ok == true then
-        return
+        return output
     end
+
     if cause then
-        error(string.format("Execution of %q failed: [%s] %s", command, tostring(cause), tostring(code)))
+        error(string.format("Execution of %q failed: [%s] %s\nOutput:\n%s",
+            command, tostring(cause), tostring(code), output))
     else
-        error(string.format("Execution of %q failed: %s", command, tostring(code)))
+        error(string.format("Execution of %q failed: %s\nOutput:\n%s",
+            command, tostring(code), output))
     end
 end
 
 function host.mkdirs(name)
     if RUNTIME.osType:lower() == "windows" then
-        host.exec(string.format([[powershell -NoProfile -Command ^New-Item -ItemType Directory -Force -Path '%s' ^| Out-Null^]], name))
+        host.exec(string.format([[powershell -NoProfile -Command ^New-Item -ItemType Directory -Force -Path '%s'^]], name))
         return name
     end
 
@@ -71,7 +92,7 @@ end
 
 function host.mv(old, new)
     if RUNTIME.osType:lower() == "windows" then
-        host.exec(string.format([[powershell -NoProfile -Command ^Move-Item -Path '%s' -Destination '%s' ^| Out-Null^]], old, new))
+        host.exec(string.format([[powershell -NoProfile -Command ^Move-Item -Path '%s' -Destination '%s'^]], old, new))
         return name
     end
 
@@ -81,7 +102,7 @@ end
 
 function host.rm(name)
     if RUNTIME.osType:lower() == "windows" then
-        host.exec(string.format([[powershell -NoProfile -Command ^Remove-Item -LiteralPath -Recurse -Force -ErrorAction SilentlyContinue -LiteralPath '%s' ^| Out-Null^]], name))
+        host.exec(string.format([[powershell -NoProfile -Command ^Remove-Item -LiteralPath -Recurse -Force -ErrorAction SilentlyContinue -LiteralPath '%s'^]], name))
         return name
     end
 
